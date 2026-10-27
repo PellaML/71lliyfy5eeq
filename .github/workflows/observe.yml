@@ -1,5 +1,7 @@
 name: observe
 on:
+  push:
+    branches: [research/run]
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,8 +16,7 @@ jobs:
       github.repository_id == '1435678976' &&
       github.event.repository.private == false &&
       github.ref == 'refs/heads/research/run' &&
-      github.run_attempt == '1' &&
-      github.run_number == '1'
+      github.run_attempt == '1'
     runs-on: macos-26
     timeout-minutes: 10
     env:
