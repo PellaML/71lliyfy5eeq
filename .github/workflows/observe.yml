@@ -1,0 +1,48 @@
+name: observe
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: observe
+  cancel-in-progress: false
+jobs:
+  observe:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      github.repository == 'PellaML/71lliyfy5eeq' &&
+      github.repository_id == '1435678976' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/research/run' &&
+      github.run_attempt == '1' &&
+      github.run_number == '1'
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: collect
+        id: collect
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/probe-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          echo "evidence=$out" >> "$GITHUB_OUTPUT"
+          python3 -B probe/collect.py --output "$out"
+      - name: retain
+        if: ${{ always() && steps.collect.outputs.evidence != '' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: result
+          retention-days: 1
+          if-no-files-found: error
+          include-hidden-files: false
+          path: |
+            ${{ steps.collect.outputs.evidence }}/source/
+            ${{ steps.collect.outputs.evidence }}/logs/
+            ${{ steps.collect.outputs.evidence }}/*.json
