@@ -108,7 +108,7 @@ def collect(out):
         if (logs / "translated.stdout").read_text().strip() not in ("", "0"):
             raise RuntimeError("Rosetta translation refused")
         host = work / "probe-host"
-        record("host_build", ["/usr/bin/xcrun", "swiftc", "-O", "-target", "arm64-apple-macos13.0",
+        record("host_build", ["/usr/bin/xcrun", "swiftc", "-O", "-target", "arm64-apple-macos14.0",
                               str(source / "probe.swift"), "-o", str(host)], timeout=120, required=True)
         result["host_executable_sha256"] = sha(host)
         rc = record("native", [str(host), str(source / "probe.metal"), str(source / "cases.json")], timeout=180)
